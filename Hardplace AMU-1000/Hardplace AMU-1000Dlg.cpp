@@ -1,6 +1,5 @@
 
 // Hardplace AMU-1000Dlg.cpp : implementation file
-// MA10138;1;000;12;1;012;0314;0;0;-
 
 #include "pch.h"
 #include "framework.h"
@@ -207,8 +206,6 @@ HCURSOR CHardplaceAMU1000Dlg::OnQueryDragIcon()
 
 void CHardplaceAMU1000Dlg::OnClose()
 {
-	// TODO: Add your message handler code here and/or call default
-
 	KillTimer(m_idTimerEvent);
 	try
 	{
@@ -227,8 +224,6 @@ void CHardplaceAMU1000Dlg::OnClose()
 
 void CHardplaceAMU1000Dlg::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: Add your message handler code here and/or call default
-
 	if (nIDEvent == m_idTimerEvent)
 	{
 		if (m_AMU1000_Serial.IsOpen())
@@ -438,7 +433,6 @@ void CHardplaceAMU1000Dlg::onSerialException(CSerialException& ex, CSerialPort& 
 
 void CHardplaceAMU1000Dlg::OnCommOpened()
 {
-	// TODO: Add your control notification handler code here
 	try
 	{
 		if (m_AMU1000_Serial.IsOpen())
@@ -461,7 +455,6 @@ void CHardplaceAMU1000Dlg::OnCommOpened()
 
 void CHardplaceAMU1000Dlg::resetDlg()
 {
-	// TODO: Add your implementation code here.
 	SetDlgItemText(IDC_FREQUENCY, _T(""));
 	SetDlgItemText(IDC_MODE, _T(""));
 	SetDlgItemText(IDC_POWER, _T(""));
