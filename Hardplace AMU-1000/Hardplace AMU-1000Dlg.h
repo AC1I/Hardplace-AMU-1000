@@ -34,6 +34,7 @@ protected:
 
 	bool OpenCommPort(int iPort, CSerialPort& Port, bool fQuiet = false);
 	void onSerialException(CSerialException& ex, CSerialPort& Port);
+	void resetDlg();
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
@@ -46,9 +47,6 @@ public:
 	afx_msg void OnClose();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg void OnCommOpened();
-protected:
-	void resetDlg();
-public:
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 	afx_msg void OnDestroy();
 };

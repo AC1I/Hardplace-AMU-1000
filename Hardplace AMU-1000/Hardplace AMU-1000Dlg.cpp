@@ -291,6 +291,14 @@ void CHardplaceAMU1000Dlg::OnTimer(UINT_PTR nIDEvent)
 									break;
 
 								case 2:
+									if (pPart[0] == '0')
+									{
+										pPart++;
+										if (pPart[0] == '0')
+										{
+											pPart++;
+										}
+									}
 									SetDlgItemTextA(GetSafeHwnd(), IDC_POWER, pPart);
 									break;
 
@@ -303,7 +311,7 @@ void CHardplaceAMU1000Dlg::OnTimer(UINT_PTR nIDEvent)
 									szText += pPart[1];
 									SetDlgItemTextA(GetSafeHwnd(), IDC_SWR, szText);
 								}
-								break;
+									break;
 
 								case 4:
 									SetDlgItemTextA(GetSafeHwnd(), IDC_ANTENNA, pPart);
@@ -311,16 +319,29 @@ void CHardplaceAMU1000Dlg::OnTimer(UINT_PTR nIDEvent)
 
 								case 5:
 								{
-									char achBuf[16];
-									int dec, sign;
+									CStringA szLValue(pPart);
 
-									_fcvt_s(achBuf, sizeof achBuf, atof(pPart) * 0.1, 4, &dec, &sign);
-									SetDlgItemTextA(GetSafeHwnd(), IDC_LVALUE, achBuf);
+									szLValue.Insert(szLValue.GetLength() - 1, ".");
+									if (szLValue[0] == '0')
+									{
+										szLValue.Delete(0);
+									}
+									SetDlgItemTextA(GetSafeHwnd(), IDC_LVALUE, szLValue);
 								}
-								break;
+									break;
 
 								case 6:
-									SetDlgItemTextA(GetSafeHwnd(), IDC_CVALUE, pPart);
+								{
+									CStringA szCValue(pPart);
+
+									for (int nIndex(0);
+										szCValue[0] == '0' && nIndex < szCValue.GetLength() - 1;
+										nIndex++)
+									{
+										szCValue.Delete(0);
+									}
+									SetDlgItemTextA(GetSafeHwnd(), IDC_CVALUE, szCValue);
+								}
 									break;
 
 								case 7:
