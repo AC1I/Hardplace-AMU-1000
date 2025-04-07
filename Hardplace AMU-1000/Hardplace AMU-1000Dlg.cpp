@@ -52,7 +52,7 @@ END_MESSAGE_MAP()
 
 CHardplaceAMU1000Dlg::CHardplaceAMU1000Dlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_HARDPLACE_AMU1000_DIALOG, pParent)
-	, m_fPlacementSet(false)
+	, m_fPlacementSet(false), m_cNoComm(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -235,6 +235,22 @@ void CHardplaceAMU1000Dlg::OnTimer(UINT_PTR nIDEvent)
 			if (ClearCommError(HANDLE(m_AMU1000_Serial), &dwErrors, &Status))
 			{
 				dwAvailable = Status.cbInQue;
+				if (dwAvailable) {
+					m_cNoComm = 0;
+				}
+				else if (++m_cNoComm > 50)
+				{
+					try
+					{
+						m_AMU1000_Serial.Write("MR1;\r", 5);
+						m_cNoComm = 0;
+					}
+					catch (CSerialException ex)
+					{
+						onSerialException(ex, m_AMU1000_Serial);
+						m_MsgBuf.Empty();
+					}
+				}
 				for (uint8_t uchByte(0); dwAvailable; dwAvailable--)
 				{
 					try
@@ -393,7 +409,7 @@ bool CHardplaceAMU1000Dlg::OpenCommPort(int iPort, CSerialPort& Port, bool fQuie
 
 				if (Port == m_AMU1000_Serial) {
 					SetDlgItemText(IDCOMMOPEN, _T("Close"));
-					m_AMU1000_Serial.Write("MR1;", 5);
+					m_AMU1000_Serial.Write("MR1;\r", 5);
 				}
 			}
 			else if (!fQuiet)

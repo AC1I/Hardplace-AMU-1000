@@ -29,6 +29,7 @@ protected:
 	const UINT_PTR m_idTimerEvent = 1;
 	const UINT m_TimerInterval = 50;
 	bool m_fPlacementSet;
+	unsigned m_cNoComm;
 	CSerialPort m_AMU1000_Serial;
 	CStringA m_MsgBuf;
 
