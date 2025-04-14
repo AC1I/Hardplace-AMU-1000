@@ -212,6 +212,7 @@ void CHardplaceAMU1000Dlg::OnClose()
 		if (m_AMU1000_Serial.IsOpen())
 		{
 			m_AMU1000_Serial.Write("MR0;\r", 5);
+			m_AMU1000_Serial.Flush();
 			m_AMU1000_Serial.Close();
 		}
 	}
@@ -454,6 +455,7 @@ void CHardplaceAMU1000Dlg::OnCommOpened()
 		if (m_AMU1000_Serial.IsOpen())
 		{
 			m_AMU1000_Serial.Write("MR0;\r", 5);
+			m_AMU1000_Serial.Flush();
 			m_AMU1000_Serial.Close();
 			SetDlgItemText(IDCOMMOPEN, _T("Open"));
 			resetDlg();
