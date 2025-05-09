@@ -7,6 +7,7 @@
 #include "Hardplace AMU-1000Dlg.h"
 #include "afxdialogex.h"
 #include <cstdlib>
+#include "CMatchingMode.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -48,11 +49,11 @@ END_MESSAGE_MAP()
 
 // CHardplaceAMU1000Dlg dialog
 
-
+constexpr auto IDM_MATCHING_MODE = 0x0020;
 
 CHardplaceAMU1000Dlg::CHardplaceAMU1000Dlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_HARDPLACE_AMU1000_DIALOG, pParent)
-	, m_fPlacementSet(false), m_cNoComm(0)
+	, m_fPlacementSet(false), m_cNoComm(0), m_MatchingMode(1)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -86,14 +87,26 @@ BOOL CHardplaceAMU1000Dlg::OnInitDialog()
 	// IDM_ABOUTBOX must be in the system command range.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
+	ASSERT((IDM_MATCHING_MODE & 0xFFF0) == IDM_MATCHING_MODE);
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu != nullptr)
 	{
 		BOOL bNameValid;
 		CString strAboutMenu;
+		CString strMatchingMode;
+
 		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
 		ASSERT(bNameValid);
+
+		bNameValid = strMatchingMode.LoadString(IDS_MATCHINGMODE);
+		ASSERT(bNameValid);
+
+		if (!strMatchingMode.IsEmpty())
+		{
+			pSysMenu->AppendMenu(MF_SEPARATOR);
+			pSysMenu->AppendMenu(MF_STRING, IDM_MATCHING_MODE, strMatchingMode);
+		}
 		if (!strAboutMenu.IsEmpty())
 		{
 			pSysMenu->AppendMenu(MF_SEPARATOR);
@@ -161,6 +174,19 @@ void CHardplaceAMU1000Dlg::OnSysCommand(UINT nID, LPARAM lParam)
 	{
 		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
+	}
+	else if ((nID & 0xFFF0) == IDM_MATCHING_MODE)
+	{
+		CMatchingMode Dlg(nullptr, m_MatchingMode);
+		
+		if (Dlg.DoModal() == IDOK)
+		{
+			CStringA strCmd("MM");
+
+			strCmd += char(Dlg.MatchingMode() + '0');
+			strCmd += ";\r";
+			m_AMU1000_Serial.Write(strCmd, strCmd.GetLength());
+		}
 	}
 	else
 	{
@@ -233,7 +259,8 @@ void CHardplaceAMU1000Dlg::OnTimer(UINT_PTR nIDEvent)
 			DWORD dwErrors;
 			COMSTAT Status;
 
-			if (ClearCommError(HANDLE(m_AMU1000_Serial), &dwErrors, &Status))
+			if (ClearCommError(HANDLE(m_AMU1000_Serial), &dwErrors, &Status)
+				&& Status.cbOutQue <= 5)
 			{
 				dwAvailable = Status.cbInQue;
 				if (dwAvailable) {
@@ -279,6 +306,7 @@ void CHardplaceAMU1000Dlg::OnTimer(UINT_PTR nIDEvent)
 									break;
 
 								case 1:
+									m_MatchingMode = pPart[0] - '0';
 									switch (pPart[0])
 									{
 									case '0':

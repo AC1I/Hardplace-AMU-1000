@@ -50,4 +50,6 @@ public:
 	afx_msg void OnCommOpened();
 	afx_msg void OnShowWindow(BOOL bShow, UINT nStatus);
 	afx_msg void OnDestroy();
+protected:
+	int m_MatchingMode;
 };
