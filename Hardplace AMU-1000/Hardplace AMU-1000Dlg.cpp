@@ -378,7 +378,14 @@ void CHardplaceAMU1000Dlg::OnTimer(UINT_PTR nIDEvent)
 
 								case 4:
 									m_iAntennaMode = pPart[0] - '0';
-									SetDlgItemTextA(GetSafeHwnd(), IDC_ANTENNA, pPart);
+									if (m_iAntennaMode == 0)
+									{
+										SetDlgItemText(IDC_ANTENNA, _T("Auto"));
+									}
+									else
+									{
+										SetDlgItemTextA(GetSafeHwnd(), IDC_ANTENNA, pPart);
+									}
 									break;
 
 								case 5:
