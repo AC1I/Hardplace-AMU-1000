@@ -52,4 +52,5 @@ public:
 	afx_msg void OnDestroy();
 protected:
 	int m_MatchingMode;
+	int m_iAntennaMode;
 };

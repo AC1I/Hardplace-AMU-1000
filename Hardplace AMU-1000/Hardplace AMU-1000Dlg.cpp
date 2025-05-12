@@ -8,6 +8,7 @@
 #include "afxdialogex.h"
 #include <cstdlib>
 #include "CMatchingMode.h"
+#include "CAntennaDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -50,10 +51,11 @@ END_MESSAGE_MAP()
 // CHardplaceAMU1000Dlg dialog
 
 constexpr auto IDM_MATCHING_MODE = 0x0020;
+constexpr auto IDM_ANTENNA_MODE = 0x0030;
 
 CHardplaceAMU1000Dlg::CHardplaceAMU1000Dlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_HARDPLACE_AMU1000_DIALOG, pParent)
-	, m_fPlacementSet(false), m_cNoComm(0), m_MatchingMode(1)
+	, m_fPlacementSet(false), m_cNoComm(0), m_MatchingMode(1), m_iAntennaMode(-1)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -88,6 +90,9 @@ BOOL CHardplaceAMU1000Dlg::OnInitDialog()
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 	ASSERT((IDM_MATCHING_MODE & 0xFFF0) == IDM_MATCHING_MODE);
+	ASSERT(IDM_MATCHING_MODE < 0xF000);
+	ASSERT((IDM_ANTENNA_MODE & 0xFFF0) == IDM_ANTENNA_MODE);
+	ASSERT(IDM_ANTENNA_MODE < 0xF000);
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
 	if (pSysMenu != nullptr)
@@ -95,6 +100,7 @@ BOOL CHardplaceAMU1000Dlg::OnInitDialog()
 		BOOL bNameValid;
 		CString strAboutMenu;
 		CString strMatchingMode;
+		CString strAntennaMode;
 
 		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
 		ASSERT(bNameValid);
@@ -102,10 +108,14 @@ BOOL CHardplaceAMU1000Dlg::OnInitDialog()
 		bNameValid = strMatchingMode.LoadString(IDS_MATCHINGMODE);
 		ASSERT(bNameValid);
 
+		bNameValid = strAntennaMode.LoadString(IDS_ANTENNA_MODE);
+		ASSERT(bNameValid);
+
 		if (!strMatchingMode.IsEmpty())
 		{
 			pSysMenu->AppendMenu(MF_SEPARATOR);
 			pSysMenu->AppendMenu(MF_STRING, IDM_MATCHING_MODE, strMatchingMode);
+			pSysMenu->AppendMenu(MF_STRING, IDM_ANTENNA_MODE, strAntennaMode);
 		}
 		if (!strAboutMenu.IsEmpty())
 		{
@@ -184,6 +194,19 @@ void CHardplaceAMU1000Dlg::OnSysCommand(UINT nID, LPARAM lParam)
 			CStringA strCmd("MM");
 
 			strCmd += char(Dlg.MatchingMode() + '0');
+			strCmd += ";\r";
+			m_AMU1000_Serial.Write(strCmd, strCmd.GetLength());
+		}
+	}
+	else if ((nID & 0xFFF0) == IDM_ANTENNA_MODE)
+	{
+		CAntennaDlg Dlg(nullptr, m_iAntennaMode);
+
+		if (Dlg.DoModal() == IDOK)
+		{
+			CStringA strCmd("MA");
+
+			strCmd += char(Dlg.AntennaMode() + '0');
 			strCmd += ";\r";
 			m_AMU1000_Serial.Write(strCmd, strCmd.GetLength());
 		}
@@ -354,6 +377,7 @@ void CHardplaceAMU1000Dlg::OnTimer(UINT_PTR nIDEvent)
 									break;
 
 								case 4:
+									m_iAntennaMode = pPart[0] - '0';
 									SetDlgItemTextA(GetSafeHwnd(), IDC_ANTENNA, pPart);
 									break;
 
